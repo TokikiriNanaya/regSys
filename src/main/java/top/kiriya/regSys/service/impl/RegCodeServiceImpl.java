@@ -1,8 +1,12 @@
 package top.kiriya.regSys.service.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import top.kiriya.regSys.entity.RegCode;
+import top.kiriya.regSys.exception.AppException;
+import top.kiriya.regSys.exception.AppExceptionCodeMsg;
 import top.kiriya.regSys.mapper.RegCodeMapper;
 import top.kiriya.regSys.service.RegCodeService;
 import top.kiriya.regSys.util.Page;
@@ -20,6 +24,9 @@ import java.util.UUID;
  */
 @Service
 public class RegCodeServiceImpl implements RegCodeService {
+
+    private static final Logger logger = LoggerFactory.getLogger(RegCodeServiceImpl.class);
+
     @Autowired
     RegCodeMapper regCodeMapper;
 
@@ -63,13 +70,13 @@ public class RegCodeServiceImpl implements RegCodeService {
         // 注册码是否存在
         if (regCode == null) {
             // 注册码不存在
-            System.out.println("注册码不存在");
-            return false;
+            logger.info("注册码不存在");
+            throw new AppException(AppExceptionCodeMsg.VERIFYCODE_NOTEXIST);
         }
         // 是否banned
         if (regCode.getbanned() != 0) {
-            System.out.println("注册码已被禁用");
-            return false;
+            logger.info("注册码已被禁用");
+            throw new AppException(AppExceptionCodeMsg.VERIFYCODE_DISABLED);
         }
 
         Date date = new Date();
@@ -77,8 +84,8 @@ public class RegCodeServiceImpl implements RegCodeService {
         Timestamp expiryTime = regCode.getExpiryTime();
         // 校验是否过期
         if (timestamp.getTime() > expiryTime.getTime()) {
-            System.out.println("注册码已过期");
-            return false;
+            logger.info("注册码已过期");
+            throw new AppException(AppExceptionCodeMsg.VERIFYCODE_EXPIRED);
         }
         // 校验是否首次激活
         if (regCode.getActived() == 0) {
@@ -86,10 +93,10 @@ public class RegCodeServiceImpl implements RegCodeService {
             // 设置激活时间
             regCode.setActiveTime(timestamp);
             regCode.setActived(1);
-            System.out.println("首次激活");
+            logger.info("首次激活");
         } else if (!pcInfo.equals(regCode.getPcInfo())) {
-            System.out.println("电脑信息与注册码不匹配");
-            return false;
+            logger.info("电脑信息与注册码不匹配");
+            throw new AppException(AppExceptionCodeMsg.VERIFYCODE_NOTMATCH);
         }
         // 设置上次使用时间
         regCode.setLastUseTime(timestamp);
@@ -98,11 +105,10 @@ public class RegCodeServiceImpl implements RegCodeService {
         regCode.setUseCount(++useCount);
         // 更新注册码 插入使用记录
         if (regCodeMapper.updateById(regCode) > 0 && regCodeMapper.insertCodeUseRecord(regCode.getId(), timestamp, ip) > 0) {
-            System.out.println("校验成功 注册码：" + regCode.getCode());
+            logger.info("校验成功，注册码{}",regCode.getCode());
             return true;
         }
-        System.out.println("校验注册码出现错误");
-        return false;
+        throw new AppException(AppExceptionCodeMsg.SEVER_ERROR);
     }
 
     @Override
