@@ -45,5 +45,6 @@ public class JsonResult {
                 ", message='" + message + '\'' +
                 ", data=" + data +
                 '}';
+        
     }
 }
