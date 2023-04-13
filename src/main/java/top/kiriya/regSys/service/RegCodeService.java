@@ -1,11 +1,13 @@
 package top.kiriya.regSys.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import top.kiriya.regSys.entity.RegCode;
+import top.kiriya.regSys.util.JsonResult;
 import top.kiriya.regSys.util.Page;
 
 import java.util.Map;
 
-public interface RegCodeService {
+public interface RegCodeService  {
     /**
      * 生成注册码
      *
@@ -20,7 +22,7 @@ public interface RegCodeService {
      * @param code   注册码
      * @param pcInfo 电脑信息
      */
-    Boolean verifyCode(String code, String pcInfo, String ip);
+    JsonResult verifyCode(String code, String pcInfo, String ip);
 
     /**
      * 校验注册码 新

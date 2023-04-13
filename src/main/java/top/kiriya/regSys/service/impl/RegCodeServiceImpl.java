@@ -1,5 +1,6 @@
 package top.kiriya.regSys.service.impl;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import top.kiriya.regSys.exception.AppException;
 import top.kiriya.regSys.exception.AppExceptionCodeMsg;
 import top.kiriya.regSys.mapper.RegCodeMapper;
 import top.kiriya.regSys.service.RegCodeService;
+import top.kiriya.regSys.util.JsonResult;
 import top.kiriya.regSys.util.Page;
 
 import java.sql.Timestamp;
@@ -64,7 +66,7 @@ public class RegCodeServiceImpl implements RegCodeService {
     }
 
     @Override
-    public Boolean verifyCode(String code, String pcInfo, String ip) {
+    public JsonResult verifyCode(String code, String pcInfo, String ip) {
         System.out.println("开始校验注册码:" + code);
         RegCode regCode = regCodeMapper.getRegCodeByCode(code);
         // 注册码是否存在
@@ -106,7 +108,7 @@ public class RegCodeServiceImpl implements RegCodeService {
         // 更新注册码 插入使用记录
         if (regCodeMapper.updateById(regCode) > 0 && regCodeMapper.insertCodeUseRecord(regCode.getId(), timestamp, ip) > 0) {
             logger.info("校验成功，注册码{}",regCode.getCode());
-            return true;
+            return new JsonResult().setSuccess(true).setMessage("校验成功");
         }
         throw new AppException(AppExceptionCodeMsg.SEVER_ERROR);
     }

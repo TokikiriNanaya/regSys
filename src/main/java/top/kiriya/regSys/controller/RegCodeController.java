@@ -1,5 +1,6 @@
 package top.kiriya.regSys.controller;
 
+import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import top.kiriya.regSys.annotation.RequestLimit;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.net.InetAddress;
 import java.sql.Timestamp;
+import java.sql.Wrapper;
 import java.text.SimpleDateFormat;
 import java.util.Map;
 
@@ -78,7 +80,11 @@ public class RegCodeController {
     public Boolean verifyCode(@RequestParam(value = "code") String code,
                               @RequestParam(value = "pcInfo") String pcInfo,
                               HttpServletRequest request) {
-        return regCodeService.verifyCode(code, pcInfo, getIpAddr(request));
+        try {
+                return regCodeService.verifyCode(code, pcInfo, getIpAddr(request)).getSuccess();
+        }catch (Exception e){
+             return false;
+        }
     }
 
     /**
@@ -89,13 +95,9 @@ public class RegCodeController {
     @RequestLimit(count = 20, time = 60000)
     public JsonResult verifyCode2(@RequestParam(value = "code") String code,
                                   @RequestParam(value = "pcInfo") String pcInfo,
-                                  @RequestParam(value = "version") String version,
                               HttpServletRequest request) {
         //同样先验证注册码
-        if ( regCodeService.verifyCode(code, pcInfo, getIpAddr(request))){
-
-        }
-        return new JsonResult();
+        return regCodeService.verifyCode(code, pcInfo, getIpAddr(request));
     }
 
     /**
