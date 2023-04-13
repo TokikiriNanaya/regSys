@@ -18,19 +18,8 @@ public interface RegCodeService  {
 
     /**
      * 校验注册码
-     *
-     * @param code   注册码
-     * @param pcInfo 电脑信息
      */
-    JsonResult verifyCode(String code, String pcInfo, String ip);
-
-    /**
-     * 校验注册码 新
-     *
-     * @param code   注册码
-     * @param pcInfo 电脑信息
-     */
-    Boolean verifyCode2(String code, String pcInfo, String ip);
+    JsonResult verifyCode(String code, String pcInfo, String ip,String version);
 
     /**
      * 分页获取注册码

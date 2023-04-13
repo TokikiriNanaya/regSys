@@ -70,9 +70,6 @@ public class RegCodeController {
 
     /**
      * 校验注册码
-     *
-     * @param code   注册码
-     * @param pcInfo 电脑信息
      */
     @GetMapping("/verify")
     // 限制限制同一ip访问频率（需要request参数）
@@ -81,7 +78,7 @@ public class RegCodeController {
                               @RequestParam(value = "pcInfo") String pcInfo,
                               HttpServletRequest request) {
         try {
-                return regCodeService.verifyCode(code, pcInfo, getIpAddr(request)).getSuccess();
+                return regCodeService.verifyCode(code, pcInfo, getIpAddr(request),"<0.3.5").getSuccess();
         }catch (Exception e){
              return false;
         }
@@ -95,9 +92,10 @@ public class RegCodeController {
     @RequestLimit(count = 20, time = 60000)
     public JsonResult verifyCode2(@RequestParam(value = "code") String code,
                                   @RequestParam(value = "pcInfo") String pcInfo,
+                                  @RequestParam(value = "version") String version,
                               HttpServletRequest request) {
         //同样先验证注册码
-        return regCodeService.verifyCode(code, pcInfo, getIpAddr(request));
+        return regCodeService.verifyCode(code, pcInfo, getIpAddr(request),version);
     }
 
     /**

@@ -66,7 +66,7 @@ public class RegCodeServiceImpl implements RegCodeService {
     }
 
     @Override
-    public JsonResult verifyCode(String code, String pcInfo, String ip) {
+    public JsonResult verifyCode(String code, String pcInfo, String ip,String version) {
         System.out.println("开始校验注册码:" + code);
         RegCode regCode = regCodeMapper.getRegCodeByCode(code);
         // 注册码是否存在
@@ -106,17 +106,11 @@ public class RegCodeServiceImpl implements RegCodeService {
         long useCount = regCode.getUseCount();
         regCode.setUseCount(++useCount);
         // 更新注册码 插入使用记录
-        if (regCodeMapper.updateById(regCode) > 0 && regCodeMapper.insertCodeUseRecord(regCode.getId(), timestamp, ip) > 0) {
+        if (regCodeMapper.updateById(regCode) > 0 && regCodeMapper.insertCodeUseRecord(regCode.getId(), timestamp, ip,version) > 0) {
             logger.info("校验成功，注册码{}",regCode.getCode());
-            return new JsonResult().setSuccess(true).setMessage("校验成功");
+            return new JsonResult().setSuccess(true).setMessage("校验成功").setData(regCode);
         }
         throw new AppException(AppExceptionCodeMsg.SEVER_ERROR);
-    }
-
-    @Override
-    public Boolean verifyCode2(String code, String pcInfo, String ip) {
-
-        return null;
     }
 
     /**

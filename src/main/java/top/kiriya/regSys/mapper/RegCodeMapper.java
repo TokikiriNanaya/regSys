@@ -14,8 +14,8 @@ import java.util.Map;
 public interface RegCodeMapper extends BaseMapper<RegCode> {
     @Select("select * from reg_code where code=#{code}")
     public RegCode getRegCodeByCode(String code);
-    @Insert("insert into code_use_record(code_id,use_time,ip) values(#{codeId},#{useTime},#{ip})")
-    public int insertCodeUseRecord(long codeId, Timestamp useTime, String ip);
+    @Insert("insert into code_use_record(code_id,use_time,ip,version) values(#{codeId},#{useTime},#{ip},#{version})")
+    public int insertCodeUseRecord(long codeId, Timestamp useTime, String ip,String version);
     @Select("select * from reg_code limit #{start},#{size}")
     public List<RegCode> getRegCode(int start, int size);
     @Select("select count(*) from reg_code")
